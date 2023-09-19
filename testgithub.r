@@ -3,3 +3,4 @@
 xx <- 54
 print(xx+6)
 print(xx-4)
+print(xx-3)
