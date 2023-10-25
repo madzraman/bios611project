@@ -1,0 +1,178 @@
+---
+title: "HW4 (Project Dataset EDA)"
+author: "Madhuri Raman"
+date: "October 11, 2023"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, warning=FALSE, message=FALSE}
+library(knitr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(forcats)
+```
+
+# Preliminary Investigation
+
+In this project, we will be investigating US flight delay data from 2022. This data was taken from Arvind Nagaonkar's larger Flight Delay dataset on Kaggle (https://www.kaggle.com/datasets/arvindnagaonkar/flight-delay/data), which contains flight data from the Bureau of Transportation Statistics from January 2018 - April 2023. However, due to the size of the whole data set (~6 GB), we choose to only look at a subset of data, flights from 2022, for this project. We chose data from 2022 as it is representative of a nearly back-to-normal post-pandemic world. Thus, the trends we find should be the most similar to present day and useful for future predictions. 
+
+Specifically, our data set contains observations of flights in 2022. As mentioned by Arvind Nagaonkar on his Kaggle notebook, the data includes information about flights' scheduled and actual departure and arrival times. Note that this data set focuses on delayed flights, not cancelled or diverted flights. A detailed description of the columns can be found at the Kaggle link above.
+
+First, we will import our csv data set and explore the size and quality of the data. We check the number of observations and columns and in the data set, validate that the data types of each column variable are sensible, and check for any missing values.
+
+*** Note that I did this assignment locally and not through Docker or the VM so my data is uploaded locally. This will be changed for my actual project though!! Dr. Toups said we could do this assignment locally for now.
+
+```{r, message=FALSE}
+
+df_original <- read_csv("source_data/flight_delays_2022.csv")
+
+```
+
+
+```{r}
+
+sapply(df_original, typeof)
+df_original <- df_original[,-ncol(df_original)]
+dim(df_original)
+sum(is.na(df_original))
+
+```
+
+When we examine the data types of each variable, we see that all of the data types look correct. Importantly, our date variable is numeric and also split into separate columns for day, month, and year. Thus, we can add/subtract integers to dates to move forward/backward in time, and we can easily work with individual days, months, and years if needed. Most of the other columns represent an amount of time, and all units are set to minutes, as specified in the Kaggle write up. We note that the last column looks irrelevant, so it can be removed. This leaves us with `r nrow(df_original)` rows and `r ncol(df_original)` columns in the data set. We also see that there are no missing values represented by NA in the data. In later histograms or barplots, if we come across any unusual values, we will be sure to consider the possibility of them representing missingness in the data and adjust our dataframe if necessary.
+
+### Data cleaning check
+
+As a sanity check, let's first investigate the Time variables in our data to see if they make sense.
+
+We need to ensure that departure time is always less than Arrival time. Let's see how many observations exist in our data for which this does NOT hold true, and what percentage of observations they represent. 
+
+```{r}
+
+sum(df_original$DepTime >= df_original$ArrTime)
+sum(df_original$DepTime >= df_original$ArrTime)/nrow(df_original)
+
+```
+
+About 4.5% of the observations have a departure time that is greater than the arrival time. Let's examine these further.
+
+```{r}
+
+head(df_original[df_original$DepTime >= df_original$ArrTime, c("DepTime", "ArrTime")])
+mean(df_original[df_original$DepTime >= df_original$ArrTime,]$DepTime)
+mean(df_original[df_original$DepTime >= df_original$ArrTime,]$ArrTime)
+```
+
+As a reminder, the departure and arrival times are formatted as "HHMM", i.e. hours and minutes. Note that since these are numeric data types, it does not make sense to add and subtract integers from them. By examining the sample of data above, at first glance it seems odd that there are arrival times with less than 4 digits. However, we then realize that the missing leading digits are simply ones, as the "HHMM" format is in military (24-hour) time. Thus, `610` really means `0610` like 6:10am, and `7` really means `0007` like 12:07am. Let us quickly verify that for all the "time" variables in "HHMM" format, i.e. `CRSDepTime`, `DepTime`, `CRSArrTime`, `ArrTime`, `WheelsOff`, and `WheelsOn`, that the "HH" part is always between 0 and 24 and that the "MM" part is always between 0 and 59. We do this below. We will also add these hours and minutes individually as columns in our dataframe for any future use.
+
+```{r}
+
+df_new <- df_original %>% mutate(DepTime_Hours = (DepTime %/% 100), DepTime_Minutes = (DepTime %% 100),
+                                 ArrTime_Hours = (ArrTime %/% 100), ArrTime_Minutes = (ArrTime %% 100),
+                                 CRSDepTime_Hours = (CRSDepTime %/% 100), CRSDepTime_Minutes = (CRSDepTime %% 100),
+                                 CRSArrTime_Hours = (CRSArrTime %/% 100), CRSArrTime_Minutes = (CRSArrTime %% 100),
+                                 WheelsOff_Hours = (WheelsOff %/% 100), WheelsOff_Minutes = (WheelsOff %% 100),
+                                 WheelsOn_Hours = (WheelsOn %/% 100), WheelsOn_Minutes = (WheelsOn %% 100))
+
+validate_hours <- function(cv){
+    # return number of INVALID ROWS based on hours being not between 0 and 24 inclusive
+    return (sum(ifelse( 0 <= cv & cv <= 24, 0, 1))) # 1 for invalids, 0 for valids
+}
+validate_minutes <- function(cv){
+    # return number of INVALID ROWS based on hours being not between 0 and 24 inclusive
+    return (sum(ifelse( 0 <= cv & cv <= 59, 0, 1))) # 1 for invalids, 0 for valids
+}
+
+sum(validate_hours(df_new$DepTime_Hours), validate_hours(df_new$CRSDepTime_Hours), 
+    validate_hours(df_new$ArrTime_Hours), validate_hours(df_new$CRSArrTime_Hours), 
+    validate_hours(df_new$WheelsOff_Hours), validate_hours(df_new$WheelsOn_Hours))
+
+sum(validate_minutes(df_new$DepTime_Minutes), validate_minutes(df_new$CRSDepTime_Minutes), 
+    validate_minutes(df_new$ArrTime_Minutes), validate_minutes(df_new$CRSArrTime_Minutes), 
+    validate_minutes(df_new$WheelsOff_Minutes), validate_minutes(df_new$WheelsOn_Minutes))
+
+```
+
+The above sums being zero mean that all of our hours and minutes for all time variables are valid.
+
+## Initial EDA
+
+Now that we have verified that our Time variables look okay, we will now make some plots to visualize some univariate distributions and bivariate relationships in our data.
+
+### Univariate EDA
+
+#### Barplot of flights in 2022 by Month
+
+```{r}
+
+bp_flightcount_month <- ggplot(df_new) + 
+                          geom_bar(aes(x=factor(Month), y=after_stat(count)),fill='tomato2') +
+                          scale_x_discrete(labels=c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
+                                                    'Aug', 'Sep', 'Oct', 'Nov', 'Dec')) +
+                          labs(title="Distribution of Flights in 2022 by Month", 
+                               x='Month', y='Number of flights')
+bp_flightcount_month
+```
+
+We see that the distribution of flights in our data set is relatively uniform across 2022. There is a slight increase in flights in the summer months compare to the winter months, with July 2022 having the most flights and February 2022 having the least. This seems sensible due to the cold weather in February (in most of the country). Additionally, most kids are on summer vacation in July so we expect vacations to be quite common that month.
+
+#### Histogram of Departure Times
+
+```{r, warning=FALSE, message=FALSE}
+
+hist_deptime <- ggplot(df_new) + 
+                  geom_histogram(aes(x=DepTime,y=after_stat(count)),fill='tomato2', alpha=0.5) +
+                  geom_histogram(aes(x=CRSDepTime,y=after_stat(count)),fill='turquoise1', alpha=0.3) +
+                  labs(title="Distribution of Flights in 2022 by Time \n 
+                              Blue = Schedule Departure Time \n 
+                              Red = Actual Departure Time", 
+                       x='Time of day', y='Number of flights', fill="Legend") 
+hist_deptime
+
+```
+***figure out a real legend for the above plot
+
+In the plot above, we show the distributions of flights throughout the day in 2022. The blue histogram shows the scheduled departure times, the red shows the actual departure times, and the grey is where they overlap. Note that most flights start departing from 5am onwards, which explain the dip in the histogram at the start of the day. We can look at the differences between these histograms to answer the following question: at what times of the day are the scheduled and actual departure times for flights very different? When the blue parts are "sticking out" that means that more flights were scheduled for that time than the number that actually left at that time, and when red sticks out, that means that more flights left at that time than actually scheduled. We see more red later in the day and more blue earlier in the day, which makes sense as it represents flights that got delayed earlier in the day leaving later.
+
+### Bivariate EDA
+
+#### Bar plot of Weather Delays by Airline Code
+
+```{r}
+# bar plot of departure delays by each airline code
+bp_weatherdelay_airline <- ggplot(df_new) + 
+                                geom_bar(aes(x=fct_infreq(Marketing_Airline_Network), fill=sum(WeatherDelay))) +
+                                labs(title="Airlines with the most Weather Delay in 2022", 
+                                     x='Airline', 
+                                     y='total minutes of weather delay ') + 
+                                theme(legend.position="none")
+bp_weatherdelay_airline
+```
+
+The most flight delays due to weather (in terms of total minutes delayed) occur from American Airlines, Delta, and Southwest, which make sense because they are the most popular airlines and probably have the most flights to begin with. We should consider scaling this plot by the total number of flights, as this would be more meaningful for comparison. (Will do later)
+
+
+# More to come! There are a lot more relationships distributions to look into.
+
+
+# my notes
+
+0. confirm source of my data
+1. Initial investigation
+    - size of data
+        - nrows
+        - ncols
+2. Data cleaning
+    - any missing values?
+        - there are 0 NAs
+        - anything else to check?
+    - any formatting issues of strings?
+    - check the data types of each column to make sure they make sense/are what we want
+    -       numerics, strings, factors, booleans, etc
+        
+3. Questions we can ask/Plots we can make
+
+
+
