@@ -1,5 +1,5 @@
-# Use rocker/rstudio as the base image
-FROM rocker/rstudio
+# Use rocker/verse as the base image
+FROM rocker/verse
 
 # Accept build argument for USER_ID with a default value
 ARG USER_ID=1000
