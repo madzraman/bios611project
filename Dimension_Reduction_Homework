@@ -1,0 +1,8 @@
+Dimensionality Reduction Homework Assignment (Due 11/03/23)
+
+Run the following for this assignment:
+
+make derived_data/df_original_cleaned.csv derived_data/df_original_cleaned_numeric.csv figures/explained_variance.png figures/pc1_vs_pc2.png
+
+For this homework assignment, I am applying PCA to my flight delay dataset for the purposes of dimensionality reduction. I first subset only the numeric columns of the data (end of "R_scripts/data_clean.r"), and then applied PCA ("R_scripts/pca.r"). Then, we plotted the principal components against the cumulative variance explained ("figures/explained_variance.png"). From this, we notice that the first 7-8 components explain 100% of the variance in the data. The first 3-4 components itself explain over 95% of the variance in the data. When we plot PC1 vs PC2 we see a very interesting geographical structure in the plot ("figures/pc1_vs_pc2.png"). Specifically, the plot looks like a map of the United States! There is no information in the numeric dataframe about the flight cities or any latitudes and longitudes. There is only data about times and distance (in miles) between airports. Given that there are nearly 2 million flights in our dataset (which only represents one-third of 2022 flights), it makes sense that most combinations of airports around the country are represented such that the inherent geographical structure in the data is revealed by the first two principal components. 
+
