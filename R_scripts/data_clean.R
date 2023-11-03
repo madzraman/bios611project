@@ -55,8 +55,11 @@ sum(validate_minutes(df_new$DepTime_Minutes), validate_minutes(df_new$CRSDepTime
 
 # The above sums being zero mean that all of our hours and minutes for all time variables are valid.
 
-write_csv(df_new, "/home/rstudio/work/derived_data/df_original_cleaned.csv");
+write_csv(df_new, "/home/rstudio/work/derived_data/df_original_cleaned.csv")
 
+df_numeric <- df_new %>% select_if(is.numeric)
+
+write_csv(df_numeric, "/home/rstudio/work/derived_data/df_original_cleaned_numeric.csv")
 
 
 
