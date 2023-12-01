@@ -1,0 +1,15 @@
+Things to do:
+
+- add next steps/discussion 
+- add regression models or any kind of models.... what would be interesting to model the relationship of? perhaps think about the bivariate eda for ideas
+- make a correlation matrix for the variables
+- add full instructions to readme/update it
+- reorganize makefile targets 
+  - add report to makefile
+- find more plots to make
+  - maybe something with shiny or python??
+- make histogram of departure times with a real legend
+- add color coding of points to some kind of scatterplot
+
+
+- watch lectures that I skipped
