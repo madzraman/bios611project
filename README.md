@@ -39,7 +39,7 @@ RUN add-apt-repository ppa:git-core/ppa && \
     apt-get install -y git git-lfs
 ```
 
-As an aside, note that anytime you are pushing code to Github for this project, it is necessary to add:
+As an aside, note that anytime you are pushing code to Github for this project, it may be necessary to run the following code if getting an error with commits or pushes:
 
 ```
 git add .gitattributes
