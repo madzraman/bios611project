@@ -26,6 +26,7 @@ pca: \
 		Rscript R_scripts/pca.R
 
 report: \
+	clean \
 	data_cleaning \
 	eda_figures \
 	pca \
