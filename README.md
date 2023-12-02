@@ -73,6 +73,5 @@ Note that this project is completely organized in the Makefile, which is organiz
 make report
 ```
 
-This command will first run the phony target of `make clean` and create a clean folder with only scripts and source data. Then, it will make each individual step in the Makefile and ultimately output an html file called `report.html`.
-Open `report.html` to view the final project report.
+This command will first run the phony target of `make clean` and create a clean folder with only scripts and source data. If desired, you are welcome to run `make clean` separately first. Then, `make report` will make each individual step in the Makefile and ultimately output an html file called `report.html`. Again, you are welcome to make each individual make target separately. Open `report.html` in a web browser to view the final project report.
 
