@@ -4,7 +4,9 @@ subtitle: "BIOS 611 Final Project"
 author: "Madhuri Raman"
 date: "December 14, 2023"
 output:
-  html_document: default
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 # Preliminary Data Investigation

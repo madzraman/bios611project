@@ -30,6 +30,6 @@ report: \
 	data_cleaning \
 	eda_figures \
 	pca \
-	report.rmd
-		Rscript -e "rmarkdown::render('report.rmd',output_format='html_document')"
+	report.Rmd
+		Rscript -e "rmarkdown::render('report.Rmd',output_format='html_document')"
 	
