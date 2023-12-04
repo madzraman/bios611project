@@ -2,13 +2,18 @@ Hello! Welcome to my BIOS 611 Data Science Project.
 
 # Introduction
 
-In this project, we will be investigating U.S. flight delay data from 2022. This data was taken from Arvind Nagaonkar's larger Flight Delay dataset on Kaggle (https://www.kaggle.com/datasets/arvindnagaonkar/flight-delay/data), which contains flight data from the Bureau of Transportation Statistics from January 2018 - April 2023. However, due to the size of the whole data set (~6 GB), we choose to only look at a subset of data, flights from 2022, for this project. We chose data from 2022 as it is representative of a nearly back-to-normal post-pandemic world. Thus, the trends we find should be the most similar to present day and useful for future predictions. 
+In this project, we will be investigating U.S. flight delay data from 2022. This data was taken from Arvind Nagaonkar's larger Flight Delay dataset on Kaggle (https://www.kaggle.com/datasets/arvindnagaonkar/flight-delay/data), which contains flight data from the Bureau of Transportation Statistics from January 2018 - April 2023. 
+
+As mentioned by Arvind Nagaonkar in the Kaggle notebook, the dataset includes information about flights' scheduled and actual departure and arrival times. Note that this data set focuses on delayed flights, not cancelled or diverted flights. A detailed description of the columns can be found at the Kaggle link above.
+
+# Subsetting of the Data
+
+Due to the size of the whole data set (~6 GB), we choose to only look at a subset of data, flights from 2022, for this project. We chose data from 2022 as it is representative of a nearly back-to-normal post-pandemic world. Thus, the trends we find should be the most similar to present day and useful for future predictions. 
 
 We chose to further subset the 2022 flight data by randomly sampling one third of the data from every month to maintain the uniform distribution of flights month by month. This reduced the nearly 6 GB of data down to about 2 GB which was much more manageable to work with (for free) through Github Large File Storage (more details below). Note that the script that cuts the full 2022 data set down to one third of the size is included in this repo in 'R_scripts/cut_2022_onethird.R' for reference, but it is not a functional script in the context of this repo. The data contained in the `source_data` directory is already one-third of 2022 data, and is worked with directly for all other scripts used to create the final report.
 
-As mentioned by Arvind Nagaonkar on his Kaggle notebook, the dataset includes information about flights' scheduled and actual departure and arrival times. Note that this data set focuses on delayed flights, not cancelled or diverted flights. A detailed description of the columns can be found at the Kaggle link above.
 
-# Steps to Run this Project (and create report)
+# Steps to Run this Project 
 
 ## 1. Clone the Repository
 
@@ -21,11 +26,12 @@ cd bios611project
 
 ## 2. Build the Docker Container
 
-For this project, we utilize a tool called Docker to build an environment containing all of the necessary software for our project, including any R packages, Python libraries, and other dependencies. After running the above lines of code, the next step is to build the Docker container for this project, which is based on the Dockerfile contained in the repository. Simply run the following line of code to build the project Docker container.  
+For this project, we utilize a tool called Docker to build an environment containing all of the necessary software for our project, including any R packages, Python libraries, and other dependencies. Please note that this project was developed on a Linux virtual machine which already had Docker installed. After running the above lines of code, the next step is to build the Docker container for this project, which is based on the Dockerfile contained in the repository. Simply run the following line of code to build the project Docker container.  
 
 ```
 docker build . --build-arg USER_ID=$(id -u) -t 611
 ```
+
 
 ### A note about Git Large File Storage
 
@@ -73,5 +79,5 @@ Note that this project is completely organized in the Makefile, which is organiz
 make report
 ```
 
-This command will first run the phony target of `make clean` and create a clean folder with only scripts and source data. If desired, you are welcome to run `make clean` separately first. Then, `make report` will make each individual step in the Makefile and ultimately output an html file called `report.html`. Again, you are welcome to make each individual make target separately. Open `report.html` in a web browser to view the final project report.
+This command will first run the phony target of `make clean` and create a clean folder with only scripts and source data. If desired, you are welcome to run `make clean` separately first. Then, `make report` will make each individual step in the Makefile and ultimately output an html file called `report.html`. Again, you are welcome to make each individual make target separately. Open `report.html` in a web browser to view the final project report. Note that `make report` might take a few minutes to run due to the size of our dataset.
 
