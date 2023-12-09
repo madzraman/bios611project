@@ -1,7 +1,7 @@
 library(tidyverse)
 df <- read_csv("derived_data/df_original_cleaned.csv")
 
-df_numeric <- read_csv("/home/rstudio/work/derived_data/df_original_cleaned_numeric.csv")
+df_numeric <- read_csv("derived_data/df_original_cleaned_numeric.csv")
 
 pca_result <- prcomp(df_numeric %>% as.matrix())
 
