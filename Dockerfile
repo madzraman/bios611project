@@ -24,7 +24,7 @@ RUN add-apt-repository ppa:git-core/ppa && \
 # Install any required R packages
 RUN R -e "install.packages('tidyverse')"
 RUN R -e "install.packages('ggcorrplot')"
-RUN R -e "install.packages('stats')"
+
 
 
 
