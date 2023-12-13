@@ -29,7 +29,7 @@ cd bios611project
 For this project, we utilize a tool called Docker to build an environment containing all of the necessary software for our project, including any R packages, Python libraries, and other dependencies. Please note that this project was developed on a Linux virtual machine which already had Docker installed. After running the above lines of code, the next step is to build the Docker container for this project, which is based on the Dockerfile contained in the repository. Simply run the following line of code to build the project Docker container.  
 
 ```
-docker build . --build-arg USER_ID=$(id -u) -t 611
+docker build . --build-arg USER_ID=$(id -u) -t project
 ```
 
 
