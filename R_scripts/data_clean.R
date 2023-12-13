@@ -1,5 +1,5 @@
 library(tidyverse)
-library(knitr)
+
 
 df_original <- read_csv("source_data/flight_delays_2022_onethird.csv")
 

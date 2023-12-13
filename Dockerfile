@@ -22,7 +22,6 @@ RUN add-apt-repository ppa:git-core/ppa && \
     apt-get install -y git git-lfs
 
 # Install any required R packages
-RUN R -e "install.packages('tidyverse')"
 RUN R -e "install.packages('ggcorrplot')"
 
 
