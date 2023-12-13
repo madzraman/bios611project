@@ -73,7 +73,15 @@ At this point, we will assume that all code is being run from the top directory 
 setwd("/home/rstudio/work")
 ```
 
-Note that this project is completely organized in the Makefile, which is organized by the different tasks performed. The final report contains all figures and analysis done in the project with detailed discussion. To build the final report, simple run in the RStudio server terminal:
+Note that this project is completely organized in the Makefile, which is organized by the different tasks performed. The final report contains all figures and analysis done in the project with detailed discussion. 
+
+IMPORTANT: Due to the usage of Git Large File Storage, it is very important to run the following command in the RStudio terminal FIRST, before proceeding with any make tasks. This is the only way that full data set will exist in the `source_data` directory.
+
+```
+git lfs pull
+```
+
+To build the final report, simple run in the RStudio server terminal:
 
 ```
 make report
