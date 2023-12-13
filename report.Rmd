@@ -7,101 +7,265 @@ output:
   html_document:
     toc: true
     toc_float: true
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 # Preliminary Data Investigation
 
-In this project, we will be investigating US flight delay data from 2022. This data was taken from Arvind Nagaonkar's larger Flight Delay dataset on Kaggle (https://www.kaggle.com/datasets/arvindnagaonkar/flight-delay/data), which contains flight data from the Bureau of Transportation Statistics from January 2018 - April 2023. However, due to the size of the whole data set (~6 GB), we choose to only look at a subset of data, flights from 2022, for this project. We chose data from 2022 as it is representative of a nearly back-to-normal post-pandemic world. Thus, the trends we find should be the most similar to present day and useful for future predictions. We also chose to randomly sample one third of the data by month to maintain the uniform distribution of flights month by month. 
+In this project, we will be investigating US flight delay data from
+2022. This data was taken from Arvind Nagaonkar's larger Flight Delay
+dataset on Kaggle
+(<https://www.kaggle.com/datasets/arvindnagaonkar/flight-delay/data>),
+which contains flight data from the Bureau of Transportation Statistics
+from January 2018 - April 2023. However, due to the size of the whole
+data set (\~6 GB), we choose to only look at a subset of data, flights
+from 2022, for this project. We chose data from 2022 as it is
+representative of a nearly back-to-normal post-pandemic world. Thus, the
+trends we find should be the most similar to present day and useful for
+future predictions. We also chose to randomly sample one third of the
+data by month to maintain the uniform distribution of flights month by
+month.
 
-Specifically, our data set contains observations of flights in 2022. As mentioned by Arvind Nagaonkar on his Kaggle notebook, the data includes information about flights' scheduled and actual departure and arrival times. Note that this data set focuses on delayed flights, not cancelled or diverted flights. A detailed description of the columns can be found at the Kaggle link above.
+Specifically, our data set contains observations of flights in 2022. As
+mentioned by Arvind Nagaonkar on his Kaggle notebook, the data includes
+information about flights' scheduled and actual departure and arrival
+times. Note that this data set focuses on delayed flights, not cancelled
+or diverted flights. A detailed description of the columns can be found
+at the Kaggle link above.
 
-First, we import our csv data set and explore the size and quality of the data. We check the number of observations and columns and in the data set, validate that the data types of each column variable are sensible, and check for any missing values.
+First, we import our csv data set and explore the size and quality of
+the data. We check the number of observations and columns and in the
+data set, validate that the data types of each column variable are
+sensible, and check for any missing values.
 
-When we examine the data types of each variable, we see that all of the data types look correct. Importantly, our date variable is numeric and also split into separate columns for day, month, and year. Thus, we can add/subtract integers to dates to move forward/backward in time, and we can easily work with individual days, months, and years if needed. Most of the other columns represent an amount of time, and all units are set to minutes, as specified in the Kaggle write up. We note that the last column looks irrelevant, so it can be removed. We also see that there are no missing values represented by NA in the data. In later histograms or barplots, if we come across any unusual values, we will be sure to consider the possibility of them representing missingness in the data and adjust our dataframe if necessary.
+When we examine the data types of each variable, we see that all of the
+data types look correct. Importantly, our date variable is numeric and
+also split into separate columns for day, month, and year. Thus, we can
+add/subtract integers to dates to move forward/backward in time, and we
+can easily work with individual days, months, and years if needed. Most
+of the other columns represent an amount of time, and all units are set
+to minutes, as specified in the Kaggle write up. We note that the last
+column looks irrelevant, so it can be removed. We also see that there
+are no missing values represented by NA in the data. In later histograms
+or barplots, if we come across any unusual values, we will be sure to
+consider the possibility of them representing missingness in the data
+and adjust our dataframe if necessary.
 
 ### Data Cleaning Check
 
-As a sanity check, let's first investigate the Time variables in our data to see if they make sense.
+As a sanity check, let's first investigate the Time variables in our
+data to see if they make sense.
 
-We need to ensure that departure time is always less than Arrival time. Let's see how many observations exist in our data for which this does NOT hold true, and what percentage of observations they represent. About 4.5% of the observations have a departure time that is greater than the arrival time. 
+We need to ensure that departure time is always less than Arrival time.
+Let's see how many observations exist in our data for which this does
+NOT hold true, and what percentage of observations they represent. About
+4.5% of the observations have a departure time that is greater than the
+arrival time.
 
-As a reminder, the departure and arrival times are formatted as "HHMM", i.e. hours and minutes. Note that since these are numeric data types, it does not make sense to add and subtract integers from them. By examining a sample of data above, at first glance it seems odd that there are arrival times with less than 4 digits. However, we then realize that the missing leading digits are simply ones, as the "HHMM" format is in military (24-hour) time. Thus, `610` really means `0610` like 6:10am, and `7` really means `0007` like 12:07am. Let us quickly verify that for all the "time" variables in "HHMM" format, i.e. `CRSDepTime`, `DepTime`, `CRSArrTime`, `ArrTime`, `WheelsOff`, and `WheelsOn`, that the "HH" part is always between 0 and 24 and that the "MM" part is always between 0 and 59. We do this in our data cleaning script as well. Finally, we also add these hours and minutes individually as columns in our dataframe for any future use.
+As a reminder, the departure and arrival times are formatted as "HHMM",
+i.e. hours and minutes. Note that since these are numeric data types, it
+does not make sense to add and subtract integers from them. By examining
+a sample of data above, at first glance it seems odd that there are
+arrival times with less than 4 digits. However, we then realize that the
+missing leading digits are simply ones, as the "HHMM" format is in
+military (24-hour) time. Thus, `610` really means `0610` like 6:10am,
+and `7` really means `0007` like 12:07am. Let us quickly verify that for
+all the "time" variables in "HHMM" format, i.e. `CRSDepTime`, `DepTime`,
+`CRSArrTime`, `ArrTime`, `WheelsOff`, and `WheelsOn`, that the "HH" part
+is always between 0 and 24 and that the "MM" part is always between 0
+and 59. We do this in our data cleaning script as well. Finally, we also
+add these hours and minutes individually as columns in our dataframe for
+any future use.
 
 ## Initial EDA
 
-Now that we have verified that our Time variables look okay, we will now make some plots to visualize some univariate distributions and bivariate relationships in our data.
+Now that we have verified that our Time variables look okay, we will now
+make some plots to visualize some univariate distributions and bivariate
+relationships in our data.
 
 ### Univariate EDA
 
 #### Barplot of flights in 2022 by Month
 
-![Barplot of flights in 2022 by Month](figures/flightcount_by_month.png){width=50%}
+![Barplot of flights in 2022 by
+Month](figures/flightcount_by_month.png){width="75%"}
 
-We see that the distribution of flights in our data set is relatively uniform across 2022. There is a slight increase in flights in the summer months compare to the winter months, with July 2022 having the most flights and February 2022 having the least. This seems sensible due to the cold weather in February (in most of the country). Additionally, most kids are on summer vacation in July so we expect vacations to be quite common that month.
+We see that the distribution of flights in our data set is relatively
+uniform across 2022. There is a slight increase in flights in the summer
+months compare to the winter months, with July 2022 having the most
+flights and February 2022 having the least. This seems sensible due to
+the cold weather in February (in most of the country). Additionally,
+most kids are on summer vacation in July so we expect vacations to be
+quite common that month.
 
 #### Histogram of Departure Times
 
-```{r, warning=FALSE, message=FALSE}
+![Histogram of Flight Departure Times in
+2022](figures/histogram_deptimes_sched_act.png){width="75%"}
 
-# hist_deptime <- ggplot(df_new) + 
-#                   geom_histogram(aes(x=DepTime,y=after_stat(count)),fill='tomato2', alpha=0.5) +
-#                   geom_histogram(aes(x=CRSDepTime,y=after_stat(count)),fill='turquoise1', alpha=0.3) +
-#                   labs(title="Distribution of Flights in 2022 by Time \n 
-#                               Blue = Schedule Departure Time \n 
-#                               Red = Actual Departure Time", 
-#                        x='Time of day', y='Number of flights', fill="Legend") 
-# hist_deptime
-
-```
-
-***figure out a real legend for the above plot
-
-In the plot above, we show the distributions of flights throughout the day in 2022. The blue histogram shows the scheduled departure times, the red shows the actual departure times, and the grey is where they overlap. Note that most flights start departing from 5am onwards, which explain the dip in the histogram at the start of the day. We can look at the differences between these histograms to answer the following question: at what times of the day are the scheduled and actual departure times for flights very different? When the blue parts are "sticking out" that means that more flights were scheduled for that time than the number that actually left at that time, and when red sticks out, that means that more flights left at that time than actually scheduled. We see more red later in the day and more blue earlier in the day, which makes sense as it represents flights that got delayed earlier in the day leaving later.
+In the plot above, we show the distributions of flights throughout the
+day in 2022. The blue histogram shows the scheduled departure times, the
+red shows the actual departure times, and the grey is where they
+overlap. Note that most flights start departing from 5am onwards, which
+explain the dip in the histogram at the start of the day. We can look at
+the differences between these histograms to answer the following
+question: at what times of the day are the scheduled and actual
+departure times for flights very different? When the blue parts are
+"sticking out" that means that more flights were scheduled for that time
+than the number that actually left at that time, and when red sticks
+out, that means that more flights left at that time than actually
+scheduled. We see more red later in the day and more blue earlier in the
+day, which makes sense as it represents flights that got delayed earlier
+in the day leaving later.
 
 ### Bivariate EDA
 
-#### Bar plot of Weather Delays by Airline Code
+#### Barplot of Weather Delays by Airline Code
 
-![Weather Delays by Airline in 2022](figures/weatherdelays_by_airline.png){width=50%}
+![Weather Delays by Airline in
+2022](figures/total_weatherdelays_by_airline.png){width="75%"}
 
-The most flight delays due to weather (in terms of total minutes delayed) occur from American Airlines, Delta, and Southwest, which make sense because they are the most popular airlines and probably have the most flights to begin with. We should consider scaling this plot by the total number of flights, as this would be more meaningful for comparison. (Will do later)
+The most flight delays due to weather (in terms of total minutes
+delayed) occur from American Airlines, Delta, and Southwest, which make
+sense because they are the most popular airlines and probably have the
+most flights to begin with.
 
+#### Barplot of Flight Delays (overall) by Departure City
 
-# More to come! There are a lot more relationships distributions to look into.
+![Overall Flight Delays by Departure City in
+2022](figures/total_bp_delay_depcity.png){width="75%"}
+
+When looking at the top departure cities for flights by amount of flight
+delay, we see that the three cities with highest amount of delay are
+Chicago, Atlanta, and New York, which are extremely unsurprising
+considering that everyone knows these are the three busiest airports in
+the country. Here, New York probably includes both La Guardia and JFK,
+which makes it interesting for it to still be in 3rd place compared to
+Chicago (O'Hare) and Atlanta (Hartsfield-Jackson) in terms of flight
+delay. Also, I am surprised that Charlotte is in the top 10 by flight
+delays, which I did not expect since it's not a huge city. However, it
+seems to be a hub for connecting flights, especially American Airlines,
+which may lead to higher `LateAircraftDelay`. I have the same suspicion
+about Denver, which I have never been to but I believe is a hub for
+United Airlines and has similar issues.
 
 ## Dimensionality Reduction
 
 ### Principal Component Analysis
 
-We now apply PCA to the flight delay dataset for the purposes of dimensionality reduction. First, we subset only the numeric columns of the data (end of "R_scripts/data_clean.r"), and then we applied PCA ("R_scripts/pca.r"). Then, we plotted the principal components against the cumulative variance explained. 
+We now apply PCA to the flight delay dataset for the purposes of
+dimensionality reduction. First, we subset only the numeric columns of
+the data (end of "R_scripts/data_clean.r"), and then we applied PCA
+("R_scripts/pca.r"). Then, we plotted the principal components against
+the cumulative variance explained.
 
-![Cumulative Variance Explained by Principal Components](figures/explained_variance.png){width=50%}
+![Cumulative Variance Explained by Principal
+Components](figures/explained_variance.png){width="50%"}
 
-From this, we notice that the first 7-8 components explain 100% of the variance in the data. The first 3-4 components itself explain over 95% of the variance in the data. 
+From this, we notice that the first 7-8 components explain 100% of the
+variance in the data. The first 3-4 components itself explain over 95%
+of the variance in the data.
 
-When we plot PC1 vs PC2 we see a very interesting geographical structure in the plot. 
+When we plot PC1 vs PC2 we see a very interesting geographical structure
+in the plot.
 
-![Cumulative Variance Explained by Principal Components](figures/pc1_vs_pc2.png){width=50%}
+![Cumulative Variance Explained by Principal
+Components](figures/pc1_vs_pc2.png){width="75%"}
 
-Specifically, the plot looks like a map of the United States! There is no information 
-in the numeric dataframe about the flight cities or any latitudes and longitudes. 
-There is only data about times and distance (in miles) between airports. Given that 
-there are nearly 2 million flights in our dataset (which only represents one-third 
-of 2022 flights), it makes sense that most combinations of airports around the 
-country are represented such that the inherent geographical structure in the data 
-is revealed by the first two principal components. 
-
-### Clustering???
-
+Specifically, the plot looks like a map of the United States! There is
+no information in the numeric dataframe about the flight cities or any
+latitudes and longitudes. There is only data about times and distance
+(in miles) between airports. Given that there are nearly 2 million
+flights in our dataset (which only represents one-third of 2022
+flights), it makes sense that most combinations of airports around the
+country are represented such that the inherent geographical structure in
+the data is revealed by the first two principal components.
 
 ## Modeling
 
-### Regression model 1
+In this dataset, we are given data about scheduled vs. arrival times, as
+well as five different specific types of delays that sum to the overall
+flight delay time. These types of delays are:
 
+-   Carrier Delay, in Minutes
+-   Weather Delay, in Minutes
+-   National Air System Delay, in Minutes
+-   Security Delay, in Minutes
+-   Late Aircraft Delay, in Minutes
 
+The biggest question that travelers (and their loved ones) have is:
 
-### regression model 2??
+***WHY IS MY FLIGHT DELAYED???***
 
+Our goal now is to try to predict overall flight delay time from the
+five types of delays, and see which types contribute more significantly
+to the overall flight delay. First, let's take a look at a correlation
+matrix between all five types of delays to see if there is any
+collinearity amongst those variables.
+
+![Correlation Matrix of Flight Delay
+Types](figures/delaytypes_corr_matrix.png){width="75%"}
+
+We see that the types of delay are highly uncorrelated with each other.
+Thus, there is no collinearity to worry about.
+
+Finally, we run the following linear regression model:
+
+$$ DepDelay = \beta_0 + \beta_1Carrier + \beta_2 Weather + \beta_3 NAS + \beta_4Security + \beta_5 LateAircraft + \epsilon$$
+
+The following table is a summary of the regression output:
+
+```{r}
+
+regdata <- read.csv("derived_data/linear_regression_output.csv")
+knitr::kable(regdata)
+
+```
+
+When looking at the regression coefficients, we see that for all five
+delay type variables, the estimated coefficient is quite close to 1.
+They are all very similar to each other and no one coefficient or
+variable dominates in this model. Additionally, all coefficients are
+significant with extremely small, near-zero p-values. This means that it
+is worth keeping all five delay types in the model. No one delay type,
+out of Carrier, Weather, NAS, Security, and Late Aircraft seems to be a
+stronger predictor of overall delay time than any of the other types.
+This is interesting to me because I originally expected Weather to be
+the primary reason for delays in general, but maybe that's just because
+I'm from Boston :)
 
 ## Discussion and Future Work
 
+This project was very interesting, but I was definitely limited by time
+in terms of what I could look into. Additionally, I was limited by the
+free computing powers I had, so I was only able to analyze one-third of
+the 2022 flights. A full-time data scientist with the money and
+resources of Corporate America should really use all 5-6 years of data!
+
+The following are a list of ideas and questions that can be investigated
+through this data set that would provide even more insight into the
+who/what/when/where/why/hows of flight delays in the US:
+
+-   Airlines with "hubs" at specific airports: are they more efficient
+    than other airlines at those same airports? or are they less
+    efficient? For example, does it make sense for Charlotte to be a
+    "hub" for American Airlines, or would there be less delays overall
+    if it wasn't? (I suspect that hubs are a good thing, since
+    intra-airline cooperation is probably better than inter-airline
+    cooperation at an airport)
+
+-   What is the primary reason for delay at each airport or in each
+    region of the US? (I suspect weather delay anywhere that gets snow,
+    but who knows!)
+
+-   Modeling flight delay time from all variables in this data set, plus
+    any supplemental data about each airport, airline, aircraft, etc. A
+    singular model that could predict the exact amount of flight delay
+    (regardless of why) that a traveler may expect to face, given ALL
+    POSSIBLE FACTORS (time of day, time of year, everything!) could
+    probably work wonders and be sold to airports and airlines for many
+    many dollars.
+
+# Thank you for reading :)
